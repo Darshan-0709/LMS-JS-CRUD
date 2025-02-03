@@ -3,129 +3,140 @@ import dataField from "./dataField.js";
 import { inputConfig } from "../config.js";
 import product from "../Model/product.js";
 import { redirectBack, showErrors } from "../Utils/utils.js";
+import table from "./table.js";
 
 const createModal = (function () {
-	let form = null;
-	let errors = {};
-	let files = {};
+  let form = null;
+  let errors = {};
+  let files = {};
 
-	const handleSubmit = (e, errors, object, isNewProduct) => {
-		e.preventDefault();
-		if (!form) {
-			form.parentElement.removeChild(form);
-			return;
-		}
+  const handleSubmit = (e, errors, object, isNewProduct, id) => {
+    e.preventDefault();
+    if (!form) {
+      form.parentElement.removeChild(form);
+      return;
+    }
 
-		if (checkErrors(errors)) {
-			for (const key in errors) {
-				showErrors(key, errors[key]);
-			}
-			return;
-		}
-		for (const key in object) {
-			if (key === "id") continue;
-			console.log({ [key]: typeof object[key] });
-			if (typeof object[key] == "object") {
-				object[key] = files[key];
-				console.log({ [key]: files[key] });
-				continue;
-			}
-			object[key] = form[key].value;
-		}
+    if (checkErrors(errors)) {
+      for (const key in errors) {
+        showErrors(key, errors[key]);
+      }
+      return;
+    }
+    for (const key in object) {
+      if (key === "id") continue;
+      console.log({ [key]: typeof object[key] });
+      if (typeof object[key] == "object") {
+        object[key] = files[key];
+        console.log({ [key]: files[key] });
+        continue;
+      }
+      object[key] = form[key].value;
+    }
 
-		if (isNewProduct) {
-			product.addProduct(object);
-			errors = {};
-			files = {};
-			form.parentElement.removeChild(form);
-			console.log({ isNewProduct: isNewProduct });
-		} else {
-			console.log("update");
-			redirectBack();
-		}
-	};
+    if (isNewProduct) {
+      product.addProduct(object);
+      errors = {};
+      files = {};
+      form.parentElement.removeChild(form);
+      console.log({ isNewProduct: isNewProduct });
+    } else {
+      console.log({ object });
 
-	const handleInput = () => {};
+      const result = product.updateProduct(id, object);
+      if (result) {
+        const updatedProducts = product.getAllProducts();
+        const productContainer = document.querySelector(
+          "[data-table-container='product']"
+        );
+        const updatedTable = table(updatedProducts);
+        productContainer.replaceChildren(updatedTable);
+      }
+      redirectBack();
+    }
+  };
 
-	const checkErrors = (errors) => {
-		return Object.values(errors).filter(Boolean).length > 0;
-	};
+  const handleInput = () => {};
 
-	const closeModal = () => {
-		const form = document.querySelector("[data-model]");
-		if (form) {
-			form.parentElement.removeChild(form);
-		}
-	};
+  const checkErrors = (errors) => {
+    return Object.values(errors).filter(Boolean).length > 0;
+  };
 
-	function checkIsEmpty(object) {
-		return Object.values(object).find((value) => value.length > 0)
-			? false
-			: true;
-	}
+  const closeModal = () => {
+    const form = document.querySelector("[data-model]");
+    if (form) {
+      form.parentElement.removeChild(form);
+    }
+  };
 
-	const showModel = (myProduct) => {
-		const isEmpty = checkIsEmpty(myProduct);
-		console.log(myProduct);
-		console.log(isEmpty);
-		form = document.createElement("form");
-		form.setAttribute("data-model", "product");
-		form.method = "post";
-		form.enctype = "multipart/form-data";
-		form.classList.add("form", "form-modal");
+  function checkIsEmpty(object) {
+    return Object.values(object).find((value) => value.length > 0)
+      ? false
+      : true;
+  }
 
-		Object.keys(myProduct).map((key) => {
-			const inputRules = inputConfig[key];
-			if (!inputRules) {
-				return null;
-			}
+  const showModel = (myProduct) => {
+    const isEmpty = checkIsEmpty(myProduct);
+    console.log(myProduct);
+    console.log(isEmpty);
+    form = document.createElement("form");
+    form.setAttribute("data-model", "product");
+    form.method = "post";
+    form.enctype = "multipart/form-data";
+    form.classList.add("form", "form-modal");
 
-			const inputObject = {
-				config: inputRules,
-				callback: handleInput,
-				errors: errors
-			};
+    Object.keys(myProduct).map((key) => {
+      const inputRules = inputConfig[key];
+      if (!inputRules) {
+        return null;
+      }
 
-			const field = dataField(
-				key,
-				myProduct[key],
-				true,
-				inputObject,
-				(files[key] = myProduct[key])
-			);
-			form.append(field);
-			return field;
-		});
+      const inputObject = {
+        config: inputRules,
+        callback: handleInput,
+        errors: errors,
+      };
 
-		const div = document.createElement("div");
-		div.classList.add("action-buttons");
+      const field = dataField(
+        key,
+        myProduct[key],
+        true,
+        inputObject,
+        (files[key] = myProduct[key])
+      );
+      form.append(field);
+      return field;
+    });
 
-		const submit = button("submit", `${isEmpty ? "Create" : "Update"}`, [
-			"btn",
-			"btn-submit"
-		]);
+    const div = document.createElement("div");
+    div.classList.add("action-buttons");
 
-		const closeCallback = isEmpty ? redirectBack : closeModal;
-		const close = button(
-			"button",
-			`${isEmpty ? "Back" : "Close"}`,
-			["btn"],
-			closeCallback
-		);
+    const submit = button("submit", `${isEmpty ? "Create" : "Update"}`, [
+      "btn",
+      "btn-submit",
+    ]);
 
-		div.append(close);
-		div.append(submit);
-		form.append(div);
-		form.addEventListener("submit", (e) => {
-			handleSubmit(e, errors, myProduct, isEmpty);
-		});
+    const closeCallback = isEmpty ? redirectBack : closeModal;
+    const close = button(
+      "button",
+      `${isEmpty ? "Back" : "Close"}`,
+      ["btn"],
+      closeCallback
+    );
 
-		return form;
-	};
-	// createForm();
-	return {
-		showModel
-	};
+    div.append(close);
+    div.append(submit);
+    form.append(div);
+    form.addEventListener("submit", (e) => {
+      handleSubmit(e, errors, myProduct, isEmpty, myProduct.id);
+    });
+
+    return form;
+  };
+  // createForm();
+  return {
+    showModel,
+  };
 })();
 
 export default createModal;

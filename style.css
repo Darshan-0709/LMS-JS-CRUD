@@ -74,14 +74,13 @@ input {
   font-weight: 600;
 }
 
-
-img{
+img {
   display: inline-block;
   width: 100%;
   height: 100%;
 }
 
-.image-container{
+.image-container {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr));
@@ -89,14 +88,14 @@ img{
   /* border: 1px solid red; */
 }
 
-form .img-preview-container{
+form .img-preview-container {
   display: block;
   position: relative;
   width: 6rem;
   flex-wrap: wrap;
 }
 
-.btn-img-remove{
+.btn-img-remove {
   position: absolute;
   right: 0;
   top: 0;
@@ -111,7 +110,7 @@ form .img-preview-container{
   font-size: 1rem;
 }
 
-form .product-info{
+form .product-info {
   border: 1px solid var(--light-text);
   border-radius: var(--rounded);
 }
@@ -157,11 +156,11 @@ form .product-info{
   text-align: center;
 }
 
-
 /* carousel */
 
-.carousel{
+.carousel {
   max-width: 12rem;
+  max-height: 7rem;
   display: flex;
   overflow: hidden;
   gap: 1rem;
@@ -169,8 +168,9 @@ form .product-info{
   padding-inline: 1rem;
 }
 
-.carousel img{
-  display: block;
+.carousel img {
+  display: inline;
+  object-fit: contain;
   min-width: 10rem;
   padding-inline: 1rem;
   transition: transform 200ms ease-in;
@@ -179,20 +179,20 @@ form .product-info{
 .carousel .indicator {
   position: absolute;
   top: 50%;
-  width: .7rem;
+  width: 0.7rem;
   background: rgba(0, 0, 0, 0.1);
   transform: translateY(-50%);
-  box-shadow: 0rem 0px 20px 16px rgb(0 0 0 / .1);
+  box-shadow: 0rem 0px 20px 16px rgb(0 0 0 / 0.1);
   cursor: pointer;
 }
 
 .carousel .previous {
-  left: .2rem;
+  left: 0.2rem;
   animation: showIndicator 0.5s ease-in-out;
 }
 
 .carousel .next {
-  right: .2rem;
+  right: 0.2rem;
   animation: showIndicator 0.5s ease-in-out;
 }
 
@@ -238,7 +238,7 @@ form .product-info{
   animation: slideRight 0.5s ease-in-out;
 }
 
-.disable{
+.disable {
   display: none;
 }
 
@@ -261,5 +261,10 @@ form .product-info{
   display: block;
   position: relative;
   width: 15rem;
+  height: 8rem;
   flex-wrap: wrap;
+}
+
+.popup img {
+  object-fit: contain;
 }

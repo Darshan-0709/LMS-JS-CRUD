@@ -20,7 +20,6 @@ const inputConfig = {
     validations: {
       required: { value: true, message: "Please enter price" },
       min: { value: 1, message: "Minimum price should be 1" },
-      max: { value: 3000, message: "Maximum price should be 3000" },
     },
   },
   images: {
